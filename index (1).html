@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Wiki 知識庫：從高中數學到線性代數大一統</title>
+
+  <!-- KaTeX 數學排版引擎 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --sidebar-bg: #111827;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --secondary: #06b6d4;
+      --accent: #ec4899;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --code-bg: #1e293b;
+      --hover: rgba(255, 255, 255, 0.08);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --sidebar-bg: #ffffff;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(99, 102, 241, 0.15);
+      --primary: #4f46e5;
+      --primary-light: #6366f1;
+      --secondary: #0891b2;
+      --accent: #db2777;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --code-bg: #f1f5f9;
+      --hover: rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* 頂部全域導航列 */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--sidebar-bg);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--secondary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text);
+    }
+
+    .btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary-light);
+    }
+
+    /* 左側側邊欄 (Sidebar) */
+    .sidebar {
+      width: 320px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--card-border);
+      margin-top: 60px;
+      height: calc(100vh - 60px);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .search-box {
+      padding: 16px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-light);
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 12px;
+      list-style: none;
+    }
+
+    .menu-group-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 12px 10px 6px 10px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .menu-item:hover {
+      background: var(--hover);
+      color: var(--text);
+    }
+
+    .menu-item.active {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--primary-light);
+      color: var(--primary-light);
+      font-weight: 700;
+    }
+
+    .badge-tag {
+      font-size: 0.72rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--primary-light);
+      margin-left: auto;
+    }
+
+    /* 右側主內容區 (Content Area) */
+    .main-content {
+      flex: 1;
+      margin-top: 60px;
+      height: calc(100vh - 60px);
+      overflow-y: auto;
+      padding: 40px 60px 80px 60px;
+      max-width: 980px;
+    }
+
+    .article-container {
+      display: none;
+      animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .article-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Markdown 排版樣式 */
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      line-height: 1.3;
+      background: linear-gradient(90deg, var(--text), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 32px 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--secondary);
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 24px 0 12px 0;
+      color: var(--primary-light);
+    }
+
+    p {
+      font-size: 1.02rem;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    ul, ol {
+      margin-left: 24px;
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    blockquote {
+      background: var(--card-bg);
+      border-left: 4px solid var(--primary);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+      font-size: 0.98rem;
+      color: var(--text-muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      background: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 0.95rem;
+    }
+
+    th {
+      background: rgba(99, 102, 241, 0.12);
+      color: var(--primary-light);
+      font-weight: 700;
+    }
+
+    .formula-card {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-left: 4px solid var(--primary-light);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      text-align: center;
+      font-size: 1.15rem;
+      overflow-x: auto;
+    }
+
+    .nav-pager {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    /* 響應式手機切換 */
+    @media (max-width: 860px) {
+      .sidebar {
+        position: fixed;
+        left: -320px;
+        z-index: 90;
+        transition: left 0.3s ease;
+      }
+      .sidebar.open {
+        left: 0;
+      }
+      .main-content {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部全域導航列 -->
+  <header class="topbar">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <a href="#" class="topbar-logo">
+        <span>🌌</span>
+        <span>Math Linear Algebra Wiki</span>
+      </a>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn" id="themeBtn" title="切換深/淺主題">
+        <span id="themeIcon">☀️</span> 主題
+      </button>
+      <button class="btn" id="downloadWikiBtn" title="下載本 Wiki 知識庫 (HTML)">
+        <span>💾</span> 下載 Wiki
+      </button>
+      <a href="../presentation/index.html" class="btn btn-primary" title="切換至教學 HTML 簡報">
+        <span>🖥️</span> 前往教學簡報 ➔
+      </a>
+    </div>
+  </header>
+
+  <!-- 左側導航欄 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="search-box">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜尋 Wiki 概念與定理...">
+    </div>
+    <ul class="sidebar-menu" id="menuList">
+      <div class="menu-group-title">知識庫導引</div>
+      <li class="menu-item active" data-target="doc-00">
+        <span>📑</span> 總目錄與知識圖譜
+        <span class="badge-tag">總覽</span>
+      </li>
+
+      <div class="menu-group-title">高中五大模組 (108課綱)</div>
+      <li class="menu-item" data-target="doc-01">
+        <span>📘</span> 01. 多項式代數與函數結構
+        <span class="badge-tag">高一</span>
+      </li>
+      <li class="menu-item" data-target="doc-02">
+        <span>📙</span> 02. 三角函數與幾何代數統一
+        <span class="badge-tag">高一/二</span>
+      </li>
+      <li class="menu-item" data-target="doc-03">
+        <span>📗</span> 03. 平面向量與基底幾何
+        <span class="badge-tag">高二</span>
+      </li>
+      <li class="menu-item" data-target="doc-04">
+        <span>📕</span> 04. 空間向量與維度提升
+        <span class="badge-tag">高二</span>
+      </li>
+      <li class="menu-item" data-target="doc-05">
+        <span>📓</span> 05. 矩陣與線性映射
+        <span class="badge-tag">高二選修</span>
+      </li>
+
+      <div class="menu-group-title">終極大一統</div>
+      <li class="menu-item" data-target="doc-06">
+        <span>🌌</span> 06. 線性代數的大一統視角
+        <span class="badge-tag" style="background: rgba(236, 72, 153, 0.2); color: var(--accent);">核心串接</span>
+      </li>
+
+      <div class="menu-group-title">版本與記錄</div>
+      <li class="menu-item" data-target="doc-log">
+        <span>🕒</span> 維護與更新日誌
+        <span class="badge-tag">log</span>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- 中央主內容區 -->
+  <main class="main-content" id="mainContent">
+
+    <!-- 文章 00: 總目錄與知識圖譜 -->
+    <article class="article-container active" id="doc-00">
+      <h1>LLM Wiki 知識庫總覽：高中數學與線性代數大一統</h1>
+      <blockquote>
+        <strong>主題名稱</strong>：從高中數學到線性代數的大一統之路<br>
+        <strong>核心目標</strong>：收錄高中（高一至高二）五大核心模組（多項式、三角函數、平面向量、空間向量、矩陣），並以現代「線性代數（Linear Algebra）」的公理化向量空間與線性變換視角進行全面整合與串接。<br>
+        <strong>建庫模式</strong>：採用「先討論、後生成」機制，經過主題確認、多源資料 Ingest 與語意實體萃取後編纂成庫。
+      </blockquote>
+
+      <h2>一、 知識節點目錄</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>章節編號</th>
+            <th>模組主題</th>
+            <th>年級定位</th>
+            <th>線性代數串接關鍵</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>01</strong></td>
+            <td>多項式代數與函數結構</td>
+            <td>高一上</td>
+            <td>函數向量空間 $P_n$、Vandermonde 矩陣插值、求導運算子矩陣化</td>
+          </tr>
+          <tr>
+            <td><strong>02</strong></td>
+            <td>三角函數與幾何代數統一</td>
+            <td>高一/高二</td>
+            <td>旋轉算子 $R_\theta$、和差角公式即矩陣相乘、正交函數基底</td>
+          </tr>
+          <tr>
+            <td><strong>03</strong></td>
+            <td>平面向量與基底幾何</td>
+            <td>高二上</td>
+            <td>$\mathbb{R}^2$ 有限維基底與線性組合、內積度量、二階行列式面積</td>
+          </tr>
+          <tr>
+            <td><strong>04</strong></td>
+            <td>空間向量與維度提升</td>
+            <td>高二下</td>
+            <td>$\mathbb{R}^3$ 外積反對稱性質、純量三重積、三階行列式體積</td>
+          </tr>
+          <tr>
+            <td><strong>05</strong></td>
+            <td>矩陣與線性映射</td>
+            <td>高二下選修</td>
+            <td>直行視角（Column Picture）、空間幾何拉伸、馬可夫轉移穩態</td>
+          </tr>
+          <tr>
+            <td><strong>06</strong></td>
+            <td>線性代數的大一統視角</td>
+            <td>高等數學</td>
+            <td>公理化向量空間（8大公理）、線性變換身分證、四大串聯大橋</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>二、 核心概念知識關聯圖</h2>
+      <div class="formula-card">
+        $$\text{多項式 } P_n \xrightarrow{\text{基底坐標化}} \text{向量空間 } V \xleftarrow{\text{幾何維度拓展}} \text{平面/空間向量 } \mathbb{R}^2, \mathbb{R}^3$$
+        $$\text{三角函數 } (\cos\theta, \sin\theta) \xrightarrow{\text{旋轉代數化}} \text{線性變換 } T \xleftarrow{\text{空間拉伸}} \text{矩陣 } M_{m \times n}$$
+      </div>
+
+      <div class="nav-pager">
+        <span></span>
+        <button class="btn btn-primary next-doc-btn" data-next="doc-01">閱讀第一章：多項式代數 ➔</button>
+      </div>
+    </article>
+
+    <!-- 文章 01: 多項式代數 -->
+    <article class="article-container" id="doc-01">
+      <h1>01. 多項式代數與函數結構 (Polynomials)</h1>
+      <blockquote><strong>所屬模組</strong>：高一數學必修（代數與函數） | <strong>知識定位</strong>：走向現代代數「函數向量空間」的基石。</blockquote>
+
+      <h2>1. 高中核心概念回顧</h2>
+      <p>在實數域 $\mathbb{R}$ 上，一個 $n$ 次一元實係數多項式可表示為：</p>
+      <div class="formula-card">
+        $$P(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0 \quad (a_n \neq 0)$$
+      </div>
+      <ul>
+        <li><strong>除法原理</strong>：設 $f(x), g(x)$ 為多項式且 $g(x) \neq 0$，則存在唯一商式 $q(x)$ 與餘式 $r(x)$，滿足 $f(x) = g(x)q(x) + r(x)$。</li>
+        <li><strong>餘式定理與因式定理</strong>：$f(x)$ 除以 $(x-c)$ 的餘式為 $f(c)$；$f(c) = 0 \iff (x-c)$ 為其因式。</li>
+        <li><strong>拉格朗日插值（Lagrange Interpolation）</strong>：通過相異 $n+1$ 個點 $(x_0, y_0), \dots, (x_n, y_n)$，恰存在唯一一個次數不超過 $n$ 次的多項式。</li>
+      </ul>
+
+      <h2>2. 深入理解：多項式背後的線性向量結構</h2>
+      <p>兩個多項式相加仍為多項式，乘上實數倍數亦為多項式。如果我們考慮次數不超過 $n$ 的多項式集合 $P_n$：</p>
+      <p>任意元素可拆解為標準基底 $\{1, x, x^2, \dots, x^n\}$ 的線性組合。多項式 $P(x)$ 實際上完全等價於一個 $(n+1)$ 維坐標向量：</p>
+      <div class="formula-card">
+        $$P(x) = a_0 \cdot 1 + a_1 \cdot x + \dots + a_n \cdot x^n \iff [P(x)]_{\mathcal{B}} = \begin{bmatrix} a_0 \\ a_1 \\ \vdots \\ a_n \end{bmatrix} \in \mathbb{R}^{n+1}$$
+      </div>
+
+      <h2>3. 與線性代數的串接橋樑</h2>
+      <p><strong>1. 拉格朗日插值與 Vandermonde 矩陣</strong>：將插值問題寫成線性方程組 $V \vec{a} = \vec{y}$，只要點相異，Vandermonde 行列式保證非零，必有唯一解。</p>
+      <p><strong>2. 微分運算子矩陣化</strong>：求導 $\frac{d}{dx}$ 滿足線性性 $(cf + g)' = cf' + g'$，它在基底下的作用就是乘以一個超角線微分矩陣 $D$！</p>
+
+      <div class="nav-pager">
+        <button class="btn prev-doc-btn" data-prev="doc-00">◀ 回總目錄</button>
+        <button class="btn btn-primary next-doc-btn" data-next="doc-02">閱讀第二章：三角函數 ➔</button>
+      </div>
+    </article>
+
+    <!-- 文章 02: 三角函數 -->
+    <article class="article-container" id="doc-02">
+      <h1>02. 三角函數與幾何代數統一 (Trigonometric Functions)</h1>
+      <blockquote><strong>所屬模組</strong>：高一/高二數學必修 | <strong>知識定位</strong>：從單位圓旋轉到旋轉矩陣與傅立葉正交基底。</blockquote>
+
+      <h2>1. 高中核心概念回顧</h2>
+      <p>在笛卡兒平面上，半徑為 1 的單位圓 $x^2 + y^2 = 1$。角 $\theta$ 的終邊與單位圓交點嚴格定義為：</p>
+      <div class="formula-card">
+        $$\cos\theta = x, \quad \sin\theta = y \implies \cos^2\theta + \sin^2\theta = 1$$
+      </div>
+      <p><strong>和差角公式（加法定理）</strong>：</p>
+      <div class="formula-card">
+        $$\begin{cases} \cos(\alpha+\beta) = \cos\alpha\cos\beta - \sin\alpha\sin\beta \\ \sin(\alpha+\beta) = \sin\alpha\cos\beta + \cos\alpha\sin\beta \end{cases}$$
+      </div>
+
+      <h2>2. 深入理解：三角函數即「二維剛體旋轉算子」</h2>
+      <p>和角公式絕非生硬的記憶口訣。基底向量 $\hat{i} = (1, 0)$ 旋轉 $\alpha$ 度後變成 $(\cos\alpha, \sin\alpha)$；基底向量 $\hat{j} = (0, 1)$ 旋轉 $\alpha$ 度後變成 $(-\sin\alpha, \cos\alpha)$。</p>
+      <p>將兩次旋轉動作相乘，其結果完美等價於矩陣乘法：</p>
+      <div class="formula-card">
+        $$\begin{bmatrix} \cos\alpha & -\sin\alpha \\ \sin\alpha & \cos\alpha \end{bmatrix} \begin{bmatrix} \cos\beta & -\sin\beta \\ \sin\beta & \cos\beta \end{bmatrix} = \begin{bmatrix} \cos(\alpha+\beta) & -\sin(\alpha+\beta) \\ \sin(\alpha+\beta) & \cos(\alpha+\beta) \end{bmatrix} = R_{\alpha+\beta}$$
+      </div>
+
+      <div class="nav-pager">
+        <button class="btn prev-doc-btn" data-prev="doc-01">◀ 上一章：多項式</button>
+        <button class="btn btn-primary next-doc-btn" data-next="doc-03">閱讀第三章：平面向量 ➔</button>
+      </div>
+    </article>
+
+    <!-- 文章 03: 平面向量 -->
+    <article class="article-container" id="doc-03">
+      <h1>03. 平面向量與基底幾何 (Plane Vectors in $\mathbb{R}^2$)</h1>
+      <blockquote><strong>所屬模組</strong>：高二數學必修 | <strong>知識定位</strong>：跨出純量，進入「方向 + 大小」與基底線性組合。</blockquote>
+
+      <h2>1. 高中核心概念回顧</h2>
+      <ul>
+        <li><strong>向量的幾何與代數</strong>：有向線段 $\vec{v} = (x, y) = x\hat{i} + y\hat{j}$。</li>
+        <li><strong>線性組合與基底</strong>：任何兩不平行的非零向量 $\vec{a}, \vec{b}$ 都能唯一生成整個平面 $\mathbb{R}^2$：$\vec{p} = s\vec{a} + t\vec{b}$。</li>
+        <li><strong>內積（純量積）</strong>：
+          <div class="formula-card">
+            $$\vec{a} \cdot \vec{b} = |\vec{a}||\vec{b}|\cos\theta = a_1 b_1 + a_2 b_2$$
+          </div>
+        </li>
+        <li><strong>柯西不等式</strong>：$(a_1^2 + a_2^2)(b_1^2 + b_2^2) \ge (a_1 b_1 + a_2 b_2)^2$。</li>
+      </ul>
+
+      <h2>2. 串接線性代數：二階行列式之幾何意義</h2>
+      <p>由兩向量 $\vec{a} = (a_1, a_2), \vec{b} = (b_1, b_2)$ 所圍成的平行四邊形有向面積為：</p>
+      <div class="formula-card">
+        $$\text{Area} = \left|\det \begin{bmatrix} a_1 & b_1 \\ a_2 & b_2 \end{bmatrix}\right| = |a_1 b_2 - a_2 b_1|$$
+      </div>
+      <p>當面積為 0 時，兩向量線性相關（平行），空間維度崩塌！</p>
+
+      <div class="nav-pager">
+        <button class="btn prev-doc-btn" data-prev="doc-02">◀ 上一章：三角函數</button>
+        <button class="btn btn-primary next-doc-btn" data-next="doc-04">閱讀第四章：空間向量 ➔</button>
+      </div>
+    </article>
+
+    <!-- 文章 04: 空間向量 -->
+    <article class="article-container" id="doc-04">
+      <h1>04. 空間向量與維度提升 (Space Vectors in $\mathbb{R}^3$)</h1>
+      <blockquote><strong>所屬模組</strong>：高二數學必修 | <strong>知識定位</strong>：解鎖外積與三階行列式體積形式。</blockquote>
+
+      <h2>1. 高中核心概念回顧</h2>
+      <p>空間直角坐標點 $P(x, y, z)$ 與空間向量 $\vec{v} = (x, y, z)$。模長 $|\vec{v}| = \sqrt{x^2+y^2+z^2}$。</p>
+      <p><strong>空間外積（Cross Product / 向量積）</strong>：</p>
+      <div class="formula-card">
+        $$\vec{a} \times \vec{b} = \left( \begin{vmatrix} a_2 & a_3 \\ b_2 & b_3 \end{vmatrix}, -\begin{vmatrix} a_1 & a_3 \\ b_1 & b_3 \end{vmatrix}, \begin{vmatrix} a_1 & a_2 \\ b_1 & b_2 \end{vmatrix} \right)$$
+      </div>
+      <p>外積垂直於兩向量，模長等於兩向量所張之平行四邊形面積。</p>
+
+      <h2>2. 純量三重積與平行六面體體積</h2>
+      <p>由三向量 $\vec{a}, \vec{b}, \vec{c}$ 張成的平行六面體有向體積，恰等於三階行列式：</p>
+      <div class="formula-card">
+        $$V = |(\vec{a} \times \vec{b}) \cdot \vec{c}| = \left|\det \begin{bmatrix} a_1 & b_1 & c_1 \\ a_2 & b_2 & c_2 \\ a_3 & b_3 & c_3 \end{bmatrix}\right|$$
+      </div>
+      <p>若行列式為 0，說明三向量共面，立體體積壓扁為零（降維至二維或一維）。</p>
+
+      <div class="nav-pager">
+        <button class="btn prev-doc-btn" data-prev="doc-03">◀ 上一章：平面向量</button>
+        <button class="btn btn-primary next-doc-btn" data-next="doc-05">閱讀第五章：矩陣 ➔</button>
+      </div>
+    </article>
+
+    <!-- 文章 05: 矩陣 -->
+    <article class="article-container" id="doc-05">
+      <h1>05. 矩陣與線性映射 (Matrices and Linear Transformations)</h1>
+      <blockquote><strong>所屬模組</strong>：高二數學選修 | <strong>知識定位</strong>：空間幾何變換與運算的動作執行器。</blockquote>
+
+      <h2>1. 核心回顧：二階平面幾何變換矩陣</h2>
+      <ul>
+        <li><strong>旋轉矩陣</strong>：$R_\theta = \begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix}$</li>
+        <li><strong>鏡射矩陣</strong>：$M_\theta = \begin{bmatrix} \cos 2\theta & \sin 2\theta \\ \sin 2\theta & -\cos 2\theta \end{bmatrix}$</li>
+        <li><strong>伸縮矩陣</strong>：$S = \begin{bmatrix} h & 0 \\ 0 & k \end{bmatrix}$，<strong>推移矩陣</strong>：$T = \begin{bmatrix} 1 & k \\ 0 & 1 \end{bmatrix}$</li>
+      </ul>
+
+      <h2>2. 矩陣的直行視角（Column Picture）</h2>
+      <p>矩陣乘以向量，本質是對矩陣的直行向量做線性組合：</p>
+      <div class="formula-card">
+        $$M \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} a & b \\ c & d \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = x \begin{bmatrix} a \\ c \end{bmatrix} + y \begin{bmatrix} b \\ d \end{bmatrix}$$
+      </div>
+      <p>第一直行是基底 $\hat{i}$ 變換後的落點，第二直行是基底 $\hat{j}$ 的落點！只要看清這兩根箭頭去哪，整張空間網格變換一目了然。</p>
+
+      <div class="nav-pager">
+        <button class="btn prev-doc-btn" data-prev="doc-04">◀ 上一章：空間向量</button>
+        <button class="btn btn-primary next-doc-btn" data-next="doc-06">閱讀終極篇：線性代數大一統 ➔</button>
+      </div>
+    </article>
+
+    <!-- 文章 06: 線性代數大一統 -->
+    <article class="article-container" id="doc-06">
+      <h1>06. 終極串聯：線性代數的大一統視角 (The Grand Synthesis)</h1>
+      <blockquote><strong>所屬模組</strong>：高等數學 | <strong>知識定位</strong>：以「公理化向量空間」與「線性變換」統攝高中全體幾何代數。</blockquote>
+
+      <h2>1. 什麼是「向量」？——向量空間 8 大公理</h2>
+      <p>現代數學公理中，向量<strong>絕不只是帶有箭頭的線段</strong>！只要一個集合 $V$ 定義了「加法」與「純量乘法」且滿足封閉性、結合律、分配律等 8 大公理，其內部元素皆統稱為向量：</p>
+      <div class="formula-card">
+        $$\vec{u} + \vec{v} \in V, \quad c \cdot \vec{u} \in V$$
+      </div>
+
+      <h2>2. 貫穿高中的「四大串聯大橋」</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>串接大橋</th>
+            <th>高中分散視角</th>
+            <th>線性代數大一統本質</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>橋樑 1：多項式即向量空間</strong></td>
+            <td>多項式求值與插值計算</td>
+            <td>多項式 $P_n$ 是以 $\{1, x, x^2, \dots\}$ 為基底的向量空間，求導是矩陣運算子 $D$。</td>
+          </tr>
+          <tr>
+            <td><strong>橋樑 2：三角函數即旋轉算子</strong></td>
+            <td>死記繁雜和角差角公式</td>
+            <td>和角公式是二維旋轉矩陣的連續乘法複合：$R_\alpha R_\beta = R_{\alpha+\beta}$。</td>
+          </tr>
+          <tr>
+            <td><strong>橋樑 3：幾何向量與行列式體積</strong></td>
+            <td>2D 平行四邊形面積、3D 六面體體積</td>
+            <td>行列式 $\det(M)$ 是多維空間的體積縮放因子；$\det=0$ 代表空間降維壓扁。</td>
+          </tr>
+          <tr>
+            <td><strong>橋樑 4：矩陣是線性映射身分證</strong></td>
+            <td>冷冰冰的數字表格與高斯消去</td>
+            <td>矩陣是線性算子 $T: V \to W$ 在指定基底下的坐標代表。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>3. 結論：帶著線性代數走回高中迷霧</h2>
+      <div class="formula-card">
+        “Mathematics is the art of giving the same name to different things.” —— Henri Poincaré
+      </div>
+      <p>當你看懂結構，高中數學不再是背公式的題海負擔，而是一場壯麗的宇宙空間漫遊！</p>
+
+      <div class="nav-pager">
+        <button class="btn prev-doc-btn" data-prev="doc-05">◀ 上一章：矩陣</button>
+        <button class="btn btn-primary next-doc-btn" data-next="doc-log">查看維護日誌 ➔</button>
+      </div>
+    </article>
+
+    <!-- 文章 log: 維護日誌 -->
+    <article class="article-container" id="doc-log">
+      <h1>Wiki 維護與更新日誌 (wiki/log.md)</h1>
+      <blockquote>依據蔡炎龍教授「把工作拆成 AI 能做的流程」規範建立。</blockquote>
+      <ul>
+        <li><strong>2026-11-21 17:35</strong>：完成多源 Ingest（5 篇高中 108 課綱核心文獻 + 1 篇線代綜論）。</li>
+        <li><strong>2026-11-21 17:40</strong>：完成 6 張單篇平行抽取證據卡（cards/）與逐頁稿（drafts/）。</li>
+        <li><strong>2026-11-21 17:43</strong>：生成教學型 HTML 簡報（presentation/index.html）。</li>
+        <li><strong>2026-11-21 18:08</strong>：全面升級 $\LaTeX$ 數學排版引擎（整合 KaTeX 與離線備援渲染）。</li>
+        <li><strong>2026-11-21 18:14</strong>：建置 Web-based 互動 Wiki 知識庫中心（wiki/index.html）。</li>
+      </ul>
+      <div class="nav-pager">
+        <button class="btn prev-doc-btn" data-prev="doc-06">◀ 回上一篇：線性代數大一統</button>
+        <button class="btn btn-primary" onclick="window.location.href='../presentation/index.html'">前往教學 HTML 簡報 ➔</button>
+      </div>
+    </article>
+
+  </main>
+
+  <script>
+    // 章節切換邏輯
+    const menuItems = document.querySelectorAll('.menu-item');
+    const articles = document.querySelectorAll('.article-container');
+    const searchInput = document.getElementById('searchInput');
+
+    function switchArticle(targetId) {
+      articles.forEach(a => {
+        if (a.id === targetId) {
+          a.classList.add('active');
+        } else {
+          a.classList.remove('active');
+        }
+      });
+
+      menuItems.forEach(m => {
+        if (m.getAttribute('data-target') === targetId) {
+          m.classList.add('active');
+        } else {
+          m.classList.remove('active');
+        }
+      });
+
+      // 滾動回頂部
+      document.getElementById('mainContent').scrollTop = 0;
+      location.hash = targetId;
+
+      // 觸發數學渲染
+      renderAllMath();
+    }
+
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const targetId = item.getAttribute('data-target');
+        switchArticle(targetId);
+      });
+    });
+
+    // 換頁按鈕綁定
+    document.querySelectorAll('.next-doc-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const nextId = btn.getAttribute('data-next');
+        switchArticle(nextId);
+      });
+    });
+
+    document.querySelectorAll('.prev-doc-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prevId = btn.getAttribute('data-prev');
+        switchArticle(prevId);
+      });
+    });
+
+    // 搜尋功能
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      menuItems.forEach(m => {
+        const text = m.innerText.toLowerCase();
+        if (text.includes(q) || q === '') {
+          m.style.display = 'flex';
+        } else {
+          m.style.display = 'none';
+        }
+      });
+    });
+
+    // KaTeX 數學渲染與離線備援
+    function renderAllMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.getElementById('mainContent'), {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (location.hash) {
+        const target = location.hash.replace('#', '');
+        if (document.getElementById(target)) {
+          switchArticle(target);
+        }
+      }
+      renderAllMath();
+    });
+
+    window.addEventListener('load', renderAllMath);
+    setTimeout(renderAllMath, 500);
+
+    // 主題切換
+    const themeBtn = document.getElementById('themeBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    themeBtn.addEventListener('click', () => {
+      const isLight = document.body.getAttribute('data-theme') === 'light';
+      if (isLight) {
+        document.body.removeAttribute('data-theme');
+        themeIcon.innerText = '☀️';
+      } else {
+        document.body.setAttribute('data-theme', 'light');
+        themeIcon.innerText = '🌙';
+      }
+    });
+
+    // 一鍵下載此 Wiki (HTML)
+    const downloadWikiBtn = document.getElementById('downloadWikiBtn');
+    downloadWikiBtn.addEventListener('click', () => {
+      const htmlString = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([htmlString], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '貫穿高中數學到線性代數大一統-LLM-Wiki知識庫.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
